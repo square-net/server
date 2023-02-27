@@ -21,6 +21,7 @@ import ejs from "ejs";
 import path from "path";
 import { FieldError } from "./common";
 import { isAuth } from "../middleware/isAuth";
+import { processBirthDate } from "../helpers/processBirthDate";
 
 @ObjectType()
 export class UserResponse {
@@ -163,22 +164,31 @@ export class UserResolver {
                 message: "The password lenght must be greater than 2",
             });
         }
-        if (firstName == "" || firstName == null) {
+        if (firstName === "" || firstName === null) {
             errors.push({
                 field: "firstName",
                 message: "The first name field cannot be empty",
             });
         }
-        if (lastName == "" || lastName == null) {
+        if (lastName === "" || lastName === null) {
             errors.push({
                 field: "lastName",
                 message: "The last name field cannot be empty",
             });
         }
-        if (gender == "Gender" || gender == "") {
+        if (gender === "Gender" || gender === "") {
             errors.push({
                 field: "gender",
                 message: "The gender field cannot take this value",
+            });
+        }
+
+        let age = processBirthDate(birthDate.toString());
+
+        if (age < 13) {
+            errors.push({
+                field: "birthDate",
+                message: "Users under the age of 13 cannot sign up to the platform",
             });
         }
 
@@ -443,13 +453,13 @@ export class UserResolver {
         let user;
         let status = "";
 
-        if (firstName == "" || firstName == null) {
+        if (firstName === "" || firstName === null) {
             errors.push({
                 field: "firstName",
                 message: "The first name field cannot be empty",
             });
         }
-        if (lastName == "" || lastName == null) {
+        if (lastName === "" || lastName === null) {
             errors.push({
                 field: "lastName",
                 message: "The last name field cannot be empty",
