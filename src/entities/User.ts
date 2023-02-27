@@ -24,10 +24,6 @@ export class Profile {
     @Field(() => String, { nullable: true })
     @Column({ nullable: true })
     website: string;
-
-    @Field(() => String, { nullable: true })
-    @Column({ nullable: true })
-    field: string;
 }
 
 @ObjectType()
@@ -37,42 +33,38 @@ export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Field()
-    @Column()
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
     firstName: string;
 
-    @Field()
-    @Column()
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
     lastName: string;
 
-    @Field()
-    @Column({ unique: true })
+    @Field(() => String, { nullable: false })
+    @Column({ unique: true, nullable: false })
     username: string;
 
-    @Field()
-    @Column({ unique: true })
+    @Field(() => String, { nullable: false })
+    @Column({ unique: true, nullable: false })
     email: string;
 
-    @Column()
+    @Column({ nullable: false })
     password: string;
 
-    @Field()
-    @Column()
-    title: string;
-
-    @Field()
-    @Column()
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
     gender: string;
 
-    @Field(() => String)
-    @CreateDateColumn()
+    @Field(() => String, { nullable: false })
+    @CreateDateColumn({ nullable: false })
     birthDate: Date;
 
-    @Field()
+    @Field(() => Boolean)
     @Column()
-    verified: boolean;
+    emailVerified: boolean;
 
-    @Field(() => Profile, { nullable: true })
+    @Field(() => Profile)
     @Column(() => Profile)
     profile: Profile;
 

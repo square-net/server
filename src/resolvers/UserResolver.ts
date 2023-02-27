@@ -58,6 +58,7 @@ export class UserResolver {
                 token,
                 process.env.ACCESS_TOKEN_SECRET!
             );
+            
             return User.findOne({
                 where: { id: payload.id },
                 relations: ["posts"],
@@ -105,7 +106,7 @@ export class UserResolver {
                     message: "Incorrect password",
                 });
             } else {
-                if (user.verified) {
+                if (user.emailVerified) {
                     sendRefreshToken(res, createRefreshToken(user));
                     accessToken = createAccessToken(user);
                     status = "You are now logged in.";
@@ -133,7 +134,6 @@ export class UserResolver {
         @Arg("firstName") firstName: string,
         @Arg("lastName") lastName: string,
         @Arg("password") password: string,
-        @Arg("title") title: string,
         @Arg("gender") gender: string,
         @Arg("birthDate") birthDate: Date
     ): Promise<UserResponse> {
@@ -175,12 +175,6 @@ export class UserResolver {
                 message: "The last name field cannot be empty",
             });
         }
-        if (title == "Title" || title == "") {
-            errors.push({
-                field: "title",
-                message: "The title field cannot take this value",
-            });
-        }
         if (gender == "Gender" || gender == "") {
             errors.push({
                 field: "gender",
@@ -204,10 +198,9 @@ export class UserResolver {
                         password: hashedPassword,
                         firstName: firstName,
                         lastName: lastName,
-                        title: title,
                         gender: gender,
                         birthDate: birthDate,
-                        verified: false,
+                        emailVerified: false,
                     })
                     .returning("*")
                     .execute();
@@ -273,7 +266,7 @@ export class UserResolver {
                     id: payload.id,
                 },
                 {
-                    verified: true,
+                    emailVerified: true,
                 }
             );
             status = "Your email address is now verified, so you can log in.";
@@ -321,7 +314,7 @@ export class UserResolver {
                     message:
                         "This email address is not associated with any account",
                 });
-            } else if (!user.verified) {
+            } else if (!user.emailVerified) {
                 status =
                     "Your email address is not verified. We just sent you an email containing the instructions for verification.";
                 const verifyToken = createAccessToken(user);
@@ -444,7 +437,6 @@ export class UserResolver {
         @Arg("profileBanner") profileBanner: string,
         @Arg("bio") bio: string,
         @Arg("website") website: string,
-        @Arg("field") field: string,
         @Ctx() { payload }: MyContext
     ): Promise<UserResponse> {
         let errors = [];
@@ -480,7 +472,6 @@ export class UserResolver {
                             profileBanner: profileBanner,
                             bio: bio,
                             website: website,
-                            field: field,
                         },
                     },
                 );
