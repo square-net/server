@@ -505,7 +505,6 @@ export class UserResolver {
 
                 user = await User.findOne({
                     where: { id: payload.id },
-                    relations: ["posts"],
                 });
                 status = "Your profile has been updated.";
             } catch (error) {
