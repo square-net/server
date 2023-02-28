@@ -66,7 +66,7 @@ export class User extends BaseEntity {
     @Column()
     emailVerified: boolean;
 
-    @Field(() => Profile)
+    @Field(() => Profile, { nullable: true })
     @Column(() => Profile)
     profile: Profile;
 
