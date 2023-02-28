@@ -30,33 +30,6 @@ export class Profile {
 }
 
 @ObjectType()
-export class Session {
-    @Field(() => User)
-    @ManyToOne(() => User, (user) => user.sessions, { onDelete: "CASCADE" })
-    user: User;
-
-    @Field(() => String, { nullable: false })
-    @Column({ type: "uuid", unique: true, nullable: false })
-    sessionId: string;
-
-    @Field(() => String, { nullable: false })
-    @Column({ nullable: false })
-    deviceName: string;
-
-    @Field(() => String, { nullable: false })
-    @Column({ nullable: false })
-    deviceLocation: string;
-
-    @Field(() => String, { nullable: false })
-    @CreateDateColumn({ nullable: false })
-    creationDate: Date;
-
-    @Field(() => String, { nullable: false })
-    @UpdateDateColumn({ nullable: false })
-    lastAccessDate: Date;
-}
-
-@ObjectType()
 @Entity("users")
 export class User extends BaseEntity {
     @Field(() => Int)
@@ -104,4 +77,40 @@ export class User extends BaseEntity {
     @Field(() => [Session], { nullable: true, defaultValue: [] })
     @OneToMany(() => Session, (session) => session.user, { nullable: true })
     sessions: Session[];
+}
+
+@ObjectType()
+@Entity("sessions")
+export class Session extends BaseEntity {
+    @Field(() => Int)
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Field(() => User)
+    @ManyToOne(() => User, (user) => user.sessions, { onDelete: "CASCADE" })
+    user: User;
+
+    @Field(() => String, { nullable: false })
+    @Column({ type: "uuid", unique: true, nullable: false })
+    sessionId: string;
+
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
+    clientOS: string;
+
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
+    clientName: string;
+
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
+    deviceLocation: string;
+
+    @Field(() => String, { nullable: false })
+    @CreateDateColumn({ nullable: false })
+    creationDate: Date;
+
+    @Field(() => String, { nullable: false })
+    @UpdateDateColumn({ nullable: false })
+    lastAccessDate: Date;
 }

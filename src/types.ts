@@ -3,5 +3,8 @@ import { Request, Response } from "express";
 export interface MyContext {
     req: Request;
     res: Response;
-    payload?: { id: number };
+    payload?: { 
+        id: number,
+        sessionId: string,
+    };
 }

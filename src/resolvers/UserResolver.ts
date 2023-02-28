@@ -1,4 +1,4 @@
-import { User } from "../entities/User";
+import { Session, User } from "../entities/User";
 import {
     Arg,
     Ctx,
@@ -22,6 +22,7 @@ import path from "path";
 import { FieldError } from "./common";
 import { isAuth } from "../middleware/isAuth";
 import { processBirthDate } from "../helpers/processBirthDate";
+import { v4 as uuidv4 } from "uuid";
 
 @ObjectType()
 export class UserResponse {
@@ -42,7 +43,7 @@ export class UserResponse {
 export class UserResolver {
     @Query(() => User, { nullable: true })
     findUser(@Arg("username", { nullable: true }) username: string) {
-        return User.findOne({ where: { username }, relations: ["posts"] });
+        return User.findOne({ where: { username } });
     }
 
     @Query(() => User, { nullable: true })
@@ -62,7 +63,7 @@ export class UserResolver {
             
             return User.findOne({
                 where: { id: payload.id },
-                relations: ["posts"],
+                relations: ["sessions"],
             });
         } catch (error) {
             console.error(error);
@@ -74,6 +75,7 @@ export class UserResolver {
     async login(
         @Arg("input") input: string,
         @Arg("password") password: string,
+        @Arg("sessionData") sessionData: { clientOS: string, clientName: string, deviceLocation: string },
         @Ctx() { res }: MyContext
     ): Promise<UserResponse> {
         let errors = [];
@@ -84,12 +86,12 @@ export class UserResolver {
         if (input.includes("@")) {
             user = await User.findOne({
                 where: { email: input },
-                relations: ["posts"],
+                relations: ["sessions"],
             });
         } else {
             user = await User.findOne({
                 where: { username: input },
-                relations: ["posts"],
+                relations: ["sessions"],
             });
         }
 
@@ -108,8 +110,17 @@ export class UserResolver {
                 });
             } else {
                 if (user.emailVerified) {
-                    sendRefreshToken(res, createRefreshToken(user));
-                    accessToken = createAccessToken(user);
+                    let session = await Session.create({
+                        user,
+                        sessionId: uuidv4(),
+                        clientOS: sessionData.clientOS,
+                        clientName: sessionData.clientName,
+                        deviceLocation: sessionData.deviceLocation,
+                    }).save();
+
+                    sendRefreshToken(res, createRefreshToken(user, session));
+                    accessToken = createAccessToken(user, session);
+
                     status = "You are now logged in.";
                 } else {
                     status =
@@ -245,10 +256,14 @@ export class UserResolver {
     }
 
     @Mutation(() => Boolean)
-    async logout(@Ctx() { res }: MyContext) {
-        sendRefreshToken(res, "");
-
-        return true;
+    async logout(@Ctx() { res, payload }: MyContext) {
+        await Session.delete({ sessionId: payload?.sessionId }).then(() => {
+            sendRefreshToken(res, "");
+            return true;
+        }).catch((error) => {
+            console.error(error);
+            return false;
+        })
     }
 
     @Mutation(() => Boolean)
