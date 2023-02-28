@@ -10,7 +10,7 @@ import favicon from "serve-favicon";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { verify } from "jsonwebtoken";
-import { User } from "./entities/User";
+import { Session, User } from "./entities/User";
 import { createAccessToken, createRefreshToken } from "./auth/auth";
 import { sendRefreshToken } from "./auth/sendRefreshToken";
 
@@ -58,9 +58,10 @@ async function main() {
             return res.send({ ok: false, accessToken: "" });
         }
 
-        const user = await User.findOne({ id: payload.id });
+        const user = await User.findOne({ where: { id: payload.id }, relations: ["sessions"] });
+        const session = await Session.findOne({ where: { sessionId: payload.sessionId }, relations: ["user"] });
 
-        if (!user) {
+        if (!user || !session) {
             return res.send({ ok: false, accessToken: "" });
         }
 
@@ -68,9 +69,9 @@ async function main() {
             return res.send({ ok: false, accessToken: "" });
         }
 
-        sendRefreshToken(res, createRefreshToken(user));
+        sendRefreshToken(res, createRefreshToken(user, session));
 
-        return res.send({ ok: true, accessToken: createAccessToken(user) });
+        return res.send({ ok: true, accessToken: createAccessToken(user, session) });
     });
 
     app.post("/users", async (_, res) => {

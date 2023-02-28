@@ -7,7 +7,6 @@ import {
     BaseEntity,
     ManyToOne,
     OneToMany,
-    UpdateDateColumn,
 } from "typeorm";
 
 @ObjectType()
@@ -109,8 +108,4 @@ export class Session extends BaseEntity {
     @Field(() => String, { nullable: false })
     @CreateDateColumn({ nullable: false })
     creationDate: Date;
-
-    @Field(() => String, { nullable: false })
-    @UpdateDateColumn({ nullable: false })
-    lastAccessDate: Date;
 }
