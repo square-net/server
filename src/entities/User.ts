@@ -37,7 +37,7 @@ export class Session {
 
     @Field(() => String, { nullable: false })
     @Column({ type: "uuid", unique: true, nullable: false })
-    postId: string;
+    sessionId: string;
 
     @Field(() => String, { nullable: false })
     @Column({ nullable: false })
