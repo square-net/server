@@ -75,7 +75,9 @@ export class UserResolver {
     async login(
         @Arg("input") input: string,
         @Arg("password") password: string,
-        @Arg("sessionData") sessionData: { clientOS: string, clientName: string, deviceLocation: string },
+        @Arg("clientOS") clientOS: string,
+        @Arg("clientName") clientName: string,
+        @Arg("deviceLocation") deviceLocation: string,
         @Ctx() { res }: MyContext
     ): Promise<UserResponse> {
         let errors = [];
@@ -113,9 +115,9 @@ export class UserResolver {
                     let session = await Session.create({
                         user,
                         sessionId: uuidv4(),
-                        clientOS: sessionData.clientOS,
-                        clientName: sessionData.clientName,
-                        deviceLocation: sessionData.deviceLocation,
+                        clientOS,
+                        clientName,
+                        deviceLocation,
                     }).save();
 
                     sendRefreshToken(res, createRefreshToken(user, session));
@@ -214,13 +216,13 @@ export class UserResolver {
                     .insert()
                     .into(User)
                     .values({
-                        username: username,
-                        email: email,
+                        username,
+                        email,
                         password: hashedPassword,
-                        firstName: firstName,
-                        lastName: lastName,
-                        gender: gender,
-                        birthDate: birthDate,
+                        firstName,
+                        lastName,
+                        gender,
+                        birthDate,
                         emailVerified: false,
                     })
                     .returning("*")
@@ -270,7 +272,7 @@ export class UserResolver {
     async revokeRefreshTokensForUser(@Arg("id", () => Number) id: number) {
         await getConnection()
             .getRepository(User)
-            .increment({ id: id }, "tokenVersion", 1);
+            .increment({ id }, "tokenVersion", 1);
 
         return true;
     }
@@ -490,13 +492,13 @@ export class UserResolver {
                         id: payload.id,
                     },
                     {
-                        firstName: firstName,
-                        lastName: lastName,
+                        firstName,
+                        lastName,
                         profile: {
-                            profilePicture: profilePicture,
-                            profileBanner: profileBanner,
-                            bio: bio,
-                            website: website,
+                            profilePicture,
+                            profileBanner,
+                            bio,
+                            website,
                         },
                     },
                 );
