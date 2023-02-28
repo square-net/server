@@ -46,7 +46,7 @@ async function main() {
         const token = req.cookies.cke;
 
         if (!token) {
-            return res.send({ ok: false, accessToken: "" });
+            return res.send({ ok: false, accessToken: "", sessionId: "" });
         }
 
         let payload: any = null;
@@ -55,23 +55,23 @@ async function main() {
             payload = verify(token, process.env.REFRESH_TOKEN_SECRET!);
         } catch (error) {
             console.error(error);
-            return res.send({ ok: false, accessToken: "" });
+            return res.send({ ok: false, accessToken: "", sessionId: "" });
         }
 
         const user = await User.findOne({ where: { id: payload.id }, relations: ["sessions"] });
         const session = await Session.findOne({ where: { sessionId: payload.sessionId }, relations: ["user"] });
 
         if (!user || !session) {
-            return res.send({ ok: false, accessToken: "" });
+            return res.send({ ok: false, accessToken: "", sessionId: "" });
         }
 
         if (user.tokenVersion !== payload.tokenVersion) {
-            return res.send({ ok: false, accessToken: "" });
+            return res.send({ ok: false, accessToken: "", sessionId: "" });
         }
 
         sendRefreshToken(res, createRefreshToken(user, session));
 
-        return res.send({ ok: true, accessToken: createAccessToken(user, session) });
+        return res.send({ ok: true, accessToken: createAccessToken(user, session), sessionId: session.sessionId });
     });
 
     app.post("/users", async (_, res) => {

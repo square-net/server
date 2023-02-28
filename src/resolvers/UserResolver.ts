@@ -259,13 +259,14 @@ export class UserResolver {
 
     @Mutation(() => Boolean)
     async logout(@Ctx() { res, payload }: MyContext) {
-        await Session.delete({ sessionId: payload?.sessionId }).then(() => {
+        try {
+            await Session.delete({ sessionId: payload?.sessionId });
             sendRefreshToken(res, "");
             return true;
-        }).catch((error) => {
+        } catch (error) {
             console.error(error);
             return false;
-        })
+        }
     }
 
     @Mutation(() => Boolean)
