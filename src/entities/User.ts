@@ -86,7 +86,7 @@ export class Session extends BaseEntity {
     id: number;
 
     @Field(() => User)
-    @ManyToOne(() => User, (user) => user.sessions, { onDelete: "CASCADE" })
+    @ManyToOne(() => User, (user) => user.sessions)
     user: User;
 
     @Field(() => String, { nullable: false })
