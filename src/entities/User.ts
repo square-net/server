@@ -5,6 +5,9 @@ import {
     Column,
     CreateDateColumn,
     BaseEntity,
+    ManyToOne,
+    OneToMany,
+    UpdateDateColumn,
 } from "typeorm";
 
 @ObjectType()
@@ -24,6 +27,33 @@ export class Profile {
     @Field(() => String, { nullable: true })
     @Column({ nullable: true })
     website: string;
+}
+
+@ObjectType()
+export class Session {
+    @Field(() => User)
+    @ManyToOne(() => User, (user) => user.sessions, { onDelete: "CASCADE" })
+    user: User;
+
+    @Field(() => String, { nullable: false })
+    @Column({ type: "uuid", unique: true, nullable: false })
+    postId: string;
+
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
+    deviceName: string;
+
+    @Field(() => String, { nullable: false })
+    @Column({ nullable: false })
+    deviceLocation: string;
+
+    @Field(() => String, { nullable: false })
+    @CreateDateColumn({ nullable: false })
+    creationDate: Date;
+
+    @Field(() => String, { nullable: false })
+    @UpdateDateColumn({ nullable: false })
+    lastAccessDate: Date;
 }
 
 @ObjectType()
@@ -70,4 +100,8 @@ export class User extends BaseEntity {
 
     @Column("int", { default: 0 })
     tokenVersion: number;
+
+    @Field(() => [Session], { nullable: true, defaultValue: [] })
+    @OneToMany(() => Session, (session) => session.user, { nullable: true })
+    sessions: Session[];
 }
