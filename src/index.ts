@@ -13,6 +13,7 @@ import { verify } from "jsonwebtoken";
 import { Session, User } from "./entities/User";
 import { createAccessToken, createRefreshToken } from "./auth/auth";
 import { sendRefreshToken } from "./auth/sendRefreshToken";
+import { PostResolver } from "./resolvers/PostResolver";
 
 async function main() {
     const app = express();
@@ -114,7 +115,7 @@ async function main() {
 
     const server = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [UserResolver],
+            resolvers: [UserResolver, PostResolver],
         }),
         context: ({ req, res }) => ({ req, res }),
     });

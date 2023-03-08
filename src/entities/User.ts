@@ -8,6 +8,7 @@ import {
     ManyToOne,
     OneToMany,
 } from "typeorm";
+import { Post } from "./Post";
 
 @ObjectType()
 export class Profile {
@@ -76,6 +77,10 @@ export class User extends BaseEntity {
     @Field(() => [Session], { nullable: true, defaultValue: [] })
     @OneToMany(() => Session, (session) => session.user, { nullable: true })
     sessions: Session[];
+
+    @Field(() => [Post], { nullable: true, defaultValue: [] })
+    @OneToMany(() => Post, (post) => post.author, { nullable: true })
+    posts: Post[];
 }
 
 @ObjectType()

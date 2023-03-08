@@ -43,7 +43,7 @@ export class UserResponse {
 export class UserResolver {
     @Query(() => User, { nullable: true })
     findUser(@Arg("username", { nullable: true }) username: string) {
-        return User.findOne({ where: { username } });
+        return User.findOne({ where: { username }, relations: ["posts"] });
     }
 
     @Query(() => User, { nullable: true })
@@ -63,7 +63,7 @@ export class UserResolver {
             
             return User.findOne({
                 where: { id: payload.id },
-                relations: ["sessions"],
+                relations: ["sessions", "posts"],
             });
         } catch (error) {
             console.error(error);
