@@ -14,6 +14,7 @@ import { Session, User } from "./entities/User";
 import { createAccessToken, createRefreshToken } from "./auth/auth";
 import { sendRefreshToken } from "./auth/sendRefreshToken";
 import { PostResolver } from "./resolvers/PostResolver";
+import { getPresignedUrl } from "./helpers/getPresignedUrl";
 
 async function main() {
     const app = express();
@@ -126,6 +127,12 @@ async function main() {
 
     app.listen({ port: process.env.PORT || 4000 }, () => {
         console.log("Square server started.");
+    });
+
+    app.post("/presigned-url", async (req, res) => {
+        const { key } = req.body;
+        const url = await getPresignedUrl(key);
+        res.send({ url: url });
     });
 }
 
