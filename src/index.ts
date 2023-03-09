@@ -89,10 +89,16 @@ async function main() {
         ));
 
         if (users.length > 0) {
-            return res.send({ ok: true, users: users });
+            return res.send({ ok: true, users });
         } else {
             return res.send({ ok: false, users: [] });
         }
+    });
+
+    app.post("/presigned-url", async (req, res) => {
+        const { key } = req.body;
+        const url = await getPresignedUrl(key);
+        res.send({ url });
     });
 
     await createConnection({
@@ -127,12 +133,6 @@ async function main() {
 
     app.listen({ port: process.env.PORT || 4000 }, () => {
         console.log("Square server started.");
-    });
-
-    app.post("/presigned-url", async (req, res) => {
-        const { key } = req.body;
-        const url = await getPresignedUrl(key);
-        res.send({ url: url });
     });
 }
 
