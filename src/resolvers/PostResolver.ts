@@ -31,6 +31,19 @@ export class PostResolver {
         });
     }
 
+    @Query(() => [Post])
+    userPostFeed(@Arg("userId", { nullable: true }) userId: number) {
+        return Post.find({
+            order: {
+                createdAt: "DESC",
+            },
+            where: {
+                authorId: userId,
+            },
+            relations: ["author"],
+        });
+    }
+
     @Query(() => Post, { nullable: true })
     findPost(@Arg("postId", { nullable: true }) postId: string) {
         return Post.findOne({ where: { postId }, relations: ["author"] });
