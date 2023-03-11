@@ -44,6 +44,8 @@ async function main() {
         });
     });
 
+    app.use(express.json());
+
     app.post("/", async (req, res) => {
         const token = req.cookies.cke;
 
